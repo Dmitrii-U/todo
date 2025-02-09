@@ -9,7 +9,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "wagtail (>=6.3.2,<7.0.0)",
-    "wagtail-localize (>=1.11.2,<2.0.0)"
+    "wagtail-localize (>=1.11.2,<2.0.0)",
+    "djangorestframework (>=3.15.2,<4.0.0)",
+    "djangorestframework-simplejwt (>=5.4.0,<6.0.0)"
 ]
 
 

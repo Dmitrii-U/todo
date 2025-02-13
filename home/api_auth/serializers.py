@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.models import User
@@ -9,6 +10,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     @classmethod
     def get_token(cls, user):
+        if not user.profile.is_verified:
+            errr_msg = "Ваша email не подтвержден."
+            raise AuthenticationFailed(errr_msg)
         token = super().get_token(user)
         token["username"] = user.username
 
@@ -28,6 +32,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         validators=[validate_password]
     )
 
-    class Meta():
+    def save(self, **kwargs):
+        user = super().save(**kwargs)
+        user.set_password(self.validated_data["password"])
+        user.save()
+        return user
+
+    class Meta:
         model = User
-        fields = ["email", "password", "first_name", "last_name",]
+        fields = ["email", "password", "username", "first_name", "last_name",]

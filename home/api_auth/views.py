@@ -1,14 +1,16 @@
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import permissions, generics
-
+from rest_framework import generics, permissions
+from rest_framework.request import Request
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import CustomTokenObtainPairSerializer, UserRegisterSerializer
 from home.utils import api_user_create_verify
+
+from .serializers import CustomTokenObtainPairSerializer, UserRegisterSerializer
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -28,7 +30,7 @@ class CustomObtainTokenPairView(TokenObtainPairView):
 class UserVerifyView(View):
     template_name = 'auth/verify_result.html'
 
-    def get(self, request, verification_code: str):
+    def get(self, request: Request, verification_code: str) -> HttpResponse:
         success = False
         user = User.objects.filter(profile__verify_code=verification_code).first()
         if user:

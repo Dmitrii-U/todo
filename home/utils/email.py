@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 
 
-def send_verification_email(user_email: str, verify_code: str):
+def send_verification_email(user_email: str, verify_code: str) -> None:
     params = {
         "recipient_list": [user_email],
         "subject": "Подтверждение регистрации",

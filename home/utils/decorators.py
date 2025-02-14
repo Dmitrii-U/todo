@@ -1,15 +1,18 @@
 import uuid
+
+from collections.abc import Callable, Iterable
 from functools import wraps
 
 from django.contrib.auth.models import User
 
 from home.models import UserProfile
+
 from .email import send_verification_email
 
 
-def api_user_create_verify(func):
+def api_user_create_verify(func: Callable) -> Callable:
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Iterable, **kwargs: dict) -> tuple:
         result = func(*args, **kwargs)
         verify_code = str(uuid.uuid4())
         user_email = args[0].data["email"]

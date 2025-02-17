@@ -25,7 +25,6 @@ from .serializers import (
 
 @method_decorator(csrf_exempt, name="dispatch")
 class CustomObtainTokenPairView(TokenObtainPairView):
-    permission_classes = (permissions.AllowAny,)
     serializer_class = CustomTokenObtainPairSerializer
 
 
@@ -49,10 +48,9 @@ class UserRecoveryViewSet(BaseAPIViewSet):
     def get_urlpatterns(cls) -> list:
         return [
             path("<str:username>/", cls.as_view({"get": "get"}), name="recovery"),
-            path("", cls.as_view({"patch": "update"}), name="update"),
+            path("", cls.as_view({"patch": "patch"}), name="update_pass"),
         ]
 
-    @csrf_exempt
     def get(self, request: Request, *args: tuple, **kwargs: dict) -> Response:  # noqa: ARG002
         user = self.get_object()
         user.profile.verification_code = str(uuid.uuid4())
@@ -63,7 +61,8 @@ class UserRecoveryViewSet(BaseAPIViewSet):
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
-    def update(self, request: Request, *args: tuple, **kwargs: dict) -> Response:  # noqa: ARG002
+    @csrf_exempt
+    def patch(self, request: Request, *args: tuple, **kwargs: dict) -> Response:  # noqa: ARG002
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = self.model.objects.get(verification_code=request.data["verification_code"])

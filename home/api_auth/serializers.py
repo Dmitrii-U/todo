@@ -22,6 +22,26 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
+class UserRecoverySerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password]
+    )
+    verification_code = serializers.CharField(
+        read_only=True,
+    )
+
+    def update(self, instance: User, validated_data: dict) -> User:
+        instance.set_password(validated_data["password"])
+        instance.save()
+        return instance
+
+    class Meta:
+        model = User
+        fields: ClassVar = ["email", "password", "username", "first_name", "last_name",]
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,

@@ -208,3 +208,5 @@ EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", False)
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "test@test.test")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "TESTPASSWORD")
 DEFAULT_FROM_EMAIL = "noreply@todo.ru"
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'

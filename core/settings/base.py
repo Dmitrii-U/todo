@@ -42,14 +42,14 @@ INSTALLED_APPS = [
     "wagtail",
     "modelcluster",
     "taggit",
+    "rest_framework",
+    "rest_framework_simplejwt",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
-    "rest_framework_simplejwt",
 ]
 
 MIDDLEWARE = [
@@ -190,15 +190,23 @@ WAGTAILADMIN_BASE_URL = "http://example.com"
 # This can be omitted to allow all files, but note that this may present a security risk
 # if untrusted users are allowed to upload files -
 # see https://docs.wagtail.org/en/stable/advanced_topics/deploying.html#user-uploaded-files
-WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'txt', 'xlsx', 'zip']
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
+WAGTAILDOCS_EXTENSIONS = ["csv", "docx", "key", "odt", "pdf", "pptx", "rtf", "txt", "xlsx", "zip"]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+SITE_URL = os.environ.get("SITE_URL", 'http://localhost:8000')
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.test.com")
+EMAIL_PORT = os.environ.get("EMAIL_PORT", 475)
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", False)
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", False)
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "test@test.test")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "TESTPASSWORD")
+DEFAULT_FROM_EMAIL = "noreply@todo.ru"
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'

@@ -14,7 +14,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user: User) -> Token:
         if not user.profile.is_verified:
-            errr_msg = "Ваша email не подтвержден."
+            errr_msg = "Ваш email не подтвержден."
             raise AuthenticationFailed(errr_msg)
         token = super().get_token(user)
         token["username"] = user.username
@@ -39,7 +39,10 @@ class UserRecoverySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields: ClassVar = ["email", "password", "username", "first_name", "last_name",]
+        fields: ClassVar = [
+            "email", "password", "username", "first_name", "last_name",
+            "verification_code"
+        ]
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -63,4 +66,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields: ClassVar = ["email", "password", "username", "first_name", "last_name",]
+        fields: ClassVar = [
+            "email", "password", "username", "first_name", "last_name",
+        ]

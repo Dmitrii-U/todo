@@ -11,7 +11,7 @@ from home.api_auth.views import (
 
 
 api_router = routers.SimpleRouter()
-api_router.register("pass/recovery", UserRecoveryViewSet)
+api_router.register("pass-recovery", UserRecoveryViewSet)
 
 urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),

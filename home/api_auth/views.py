@@ -3,15 +3,14 @@ import uuid
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.urls import path
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, permissions, status
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView
-from wagtail.api.v2.views import BaseAPIViewSet
 
 from home.utils import api_user_create_verify
 
@@ -37,21 +36,14 @@ class UserCreateAPIView(generics.CreateAPIView):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class UserRecoveryViewSet(BaseAPIViewSet):
+class UserRecoveryViewSet(GenericViewSet):
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserRecoverySerializer
     model = User
     queryset = User.objects.all()
     lookup_field = "username"
 
-    @classmethod
-    def get_urlpatterns(cls) -> list:
-        return [
-            path("<str:username>/", cls.as_view({"get": "get"}), name="recovery"),
-            path("", cls.as_view({"patch": "patch"}), name="update_pass"),
-        ]
-
-    def get(self, request: Request, *args: tuple, **kwargs: dict) -> Response:  # noqa: ARG002
+    def retrieve(self, request: Request, *args: tuple, **kwargs: dict) -> Response:  # noqa: ARG002
         user = self.get_object()
         user.profile.verification_code = str(uuid.uuid4())
         user.profile.save()
@@ -61,15 +53,15 @@ class UserRecoveryViewSet(BaseAPIViewSet):
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @csrf_exempt
-    def patch(self, request: Request, *args: tuple, **kwargs: dict) -> Response:  # noqa: ARG002
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = self.model.objects.get(verification_code=request.data["verification_code"])
-            if not user:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            data = {"password": serializer.validated_data["password"]}
-            self.serializer_class(user, data, partial=True)
+    def partial_update(self, request: Request, *args: tuple, **kwargs: dict) -> Response:  # noqa: ARG002
+        user = self.get_object()
+        if user.profile.verification_code != request.data["verification_code"]:
+            data = {"error": "Не верный verification_code"}
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+        data = {"password": request.data["password"]}
+        serializer = self.serializer_class(user, data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

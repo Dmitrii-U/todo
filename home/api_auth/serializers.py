@@ -1,4 +1,6 @@
-from typing import ClassVar
+import re
+
+from typing import ClassVar, NoReturn
 
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
@@ -45,11 +47,19 @@ class UserRecoverySerializer(serializers.ModelSerializer):
         ]
 
 
+def validate_email(email: str) -> NoReturn:
+    regex = re.compile("/.+@.+\..+/i")  # noqa: W605
+    if not regex.match(email):
+        err_msg = "Передан невалидный email"
+        raise serializers.ValidationError(err_msg)
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
         validators=(
             UniqueValidator(queryset=User.objects.all()),
+            validate_email,
         )
     )
     password = serializers.CharField(

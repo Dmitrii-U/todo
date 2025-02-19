@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 
 from collections.abc import Callable, Iterable
@@ -7,7 +8,7 @@ from django.contrib.auth.models import User
 
 from home.models import UserProfile
 
-from .email import send_verification_email
+from .email import send_verification_email_async
 
 
 def api_user_create_verify(func: Callable) -> Callable:
@@ -21,7 +22,7 @@ def api_user_create_verify(func: Callable) -> Callable:
             is_verified=False,
             verification_code=verification_code
         )
-        send_verification_email(user_email, verification_code)
+        asyncio.run(send_verification_email_async(user_email, verification_code))
         return result
 
     return wrapper

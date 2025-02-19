@@ -48,7 +48,7 @@ class UserRecoverySerializer(serializers.ModelSerializer):
 
 
 def validate_email(email: str) -> NoReturn:
-    regex = re.compile("/.+@.+\..+/i")  # noqa: W605
+    regex = re.compile(r".+@.+\..+", flags=re.IGNORECASE)
     if not regex.match(email):
         err_msg = "Передан невалидный email"
         raise serializers.ValidationError(err_msg)

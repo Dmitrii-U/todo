@@ -1,3 +1,5 @@
+import asyncio
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse
@@ -14,6 +16,10 @@ def send_verification_email(user_email: str, verify_code: str) -> None:
     message = f"Для подтверждения регистрации перейдите по ссылке: {url}"
     params["message"] = message
     send_mail(**params)
+
+
+async def send_verification_email_async(user_email: str, verify_code: str) -> None:
+    await asyncio.to_thread(send_verification_email, user_email, verify_code)
 
 
 def send_recovery_email(user_email: str, verification_code: str) -> None:
